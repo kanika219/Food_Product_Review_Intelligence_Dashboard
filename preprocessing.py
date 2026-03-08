@@ -5,6 +5,14 @@ from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
 from nltk.tokenize import word_tokenize
 
+def derive_sentiment(score):
+    if score <= 2:
+        return 'Negative'
+    elif score == 3:
+        return 'Neutral'
+    else:
+        return 'Positive'
+
 # Download necessary NLTK data
 def download_nltk_resources():
     try:
@@ -52,14 +60,6 @@ def prepare_dataset(df):
     df['review'] = df['Summary'].fillna('') + " " + df['Text'].fillna('')
     
     # Convert rating to sentiment labels
-    def get_sentiment(score):
-        if score <= 2:
-            return 'Negative'
-        elif score == 3:
-            return 'Neutral'
-        else:
-            return 'Positive'
-            
-    df['sentiment'] = df['Score'].apply(get_sentiment)
+    df['sentiment'] = df['Score'].apply(derive_sentiment)
     
     return df

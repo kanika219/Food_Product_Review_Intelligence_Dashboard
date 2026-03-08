@@ -6,10 +6,7 @@ from wordcloud import WordCloud
 import matplotlib.pyplot as plt
 from collections import Counter
 import os
-import tensorflow as tf
-import pickle
-from predict import SentimentPredictor
-from preprocessing import clean_text
+from preprocessing import clean_text, derive_sentiment
 
 # Page Configuration
 st.set_page_config(page_title="Food Product Review Intelligence", layout="wide", initial_sidebar_state="expanded")
@@ -40,16 +37,8 @@ st.markdown("""
 @st.cache_data
 def load_dataset():
     if os.path.exists("Reviews.csv"):
-        # Load subset for speed if needed, but let's try the whole file first for searching
         return pd.read_csv("Reviews.csv")
     return pd.DataFrame()
-
-# Load Model
-@st.cache_resource
-def load_predictor():
-    if os.path.exists('sentiment_model.h5') and os.path.exists('tokenizer.pkl') and os.path.exists('label_encoder.pkl'):
-        return SentimentPredictor('sentiment_model.h5', 'tokenizer.pkl', 'label_encoder.pkl')
-    return None
 
 def get_insights(df, sentiment):
     # Filter by sentiment
@@ -75,14 +64,9 @@ def main():
     product_query = st.sidebar.text_input("Search Food Product", placeholder="e.g., coffee, chocolate")
     analyze_button = st.sidebar.button("Analyze Reviews")
     
-    # Load data and model
+    # Load data
     df_raw = load_dataset()
-    predictor = load_predictor()
     
-    if not predictor:
-        st.warning("Model not found. Please train the model using train_model.py first.")
-        return
-        
     if analyze_button and product_query:
         # Filter reviews
         filtered_df = df_raw[df_raw["Text"].str.contains(product_query, case=False, na=False)].copy()
@@ -95,13 +79,10 @@ def main():
         analysis_df = filtered_df.head(500).copy()
         
         with st.spinner(f"Analyzing {len(analysis_df)} reviews for '{product_query}'..."):
-            # Predict sentiments
-            reviews_list = (analysis_df['Summary'].fillna('') + " " + analysis_df['Text'].fillna('')).tolist()
-            sentiments, confidences, cleaned_texts = predictor.predict(reviews_list)
-            
-            analysis_df['Sentiment'] = sentiments
-            analysis_df['Confidence'] = confidences
-            analysis_df['Cleaned_Review'] = cleaned_texts
+            # Use Score column to assign sentiment
+            analysis_df['Sentiment'] = analysis_df['Score'].apply(derive_sentiment)
+            analysis_df['Confidence'] = 1.0 # Rule-based mapping has full confidence
+            analysis_df['Cleaned_Review'] = analysis_df['Text'].apply(clean_text)
             
         # Metrics Section
         col1, col2, col3, col4 = st.columns(4)

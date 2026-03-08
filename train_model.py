@@ -10,7 +10,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
 import pickle
 import os
-from preprocessing import clean_text, prepare_dataset
+from preprocessing import clean_text, prepare_dataset, derive_sentiment
 
 # Set random seed for reproducibility
 np.random.seed(42)
