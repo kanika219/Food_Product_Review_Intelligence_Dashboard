@@ -2,6 +2,8 @@
 
 A Streamlit-based dashboard for analyzing sentiment and customer insights from the Amazon Fine Food Reviews dataset.
 
+**Dashboard Link** : https://food-review-intelligence-dashboard.streamlit.app/
+
 ## Features
 - **Product Search**: Search for reviews of specific food products (e.g., coffee, chocolate).
 - **Sentiment Analysis**: Sentiment is derived directly from user scores (1-2: Negative, 3: Neutral, 4-5: Positive).
