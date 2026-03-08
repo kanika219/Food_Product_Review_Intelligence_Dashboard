@@ -2,8 +2,7 @@ streamlit
 pandas
 numpy
 scikit-learn
-tensorflow
+tensorflow==2.13.0
 nltk
 plotly
 wordcloud
-joblib
